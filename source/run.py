@@ -19,10 +19,30 @@ print('Getting info for all products')
 product_info = df_asins['Customer search term'].apply(
     lambda x: pd.Series(get_product_info(x)))
 
-# Token count matrix for titles:
-tokens_title = get_token_counts(product_info['title'])
 
-# Document count for titles
+# TITLES:
+# Token count matrix:
+tokens_title = get_token_counts(product_info['title'])
+# Document count:
 tkn_doc_count_title = (tokens_title > 0).sum(axis=0)
-tkn_doc_count_title.sort_values(ascending=False)
-tkn_doc_count_title.head(20)
+print(tkn_doc_count_title.sort_values(ascending=False).head(20))
+
+# bi-grams:
+tokens_title = get_token_counts(product_info['title'], ngrams=2)
+tkn_doc_count_title = (tokens_title > 0).sum(axis=0)
+print(tkn_doc_count_title.sort_values(ascending=False).head(20))
+
+
+# FEATURES:
+tokens_feat = get_token_counts(product_info['features'])
+tkn_doc_count_feat = (tokens_feat > 0).sum(axis=0)
+print(tkn_doc_count_feat.sort_values(ascending=False).head(20))
+
+# bi-grams
+tokens_feat = get_token_counts(product_info['features'], ngrams=2)
+tkn_doc_count_feat = (tokens_feat > 0).sum(axis=0)
+print(tkn_doc_count_feat.sort_values(ascending=False).head(20))
+
+
+# CATEGORY
+print(product_info['category'].value_counts())

@@ -82,10 +82,12 @@ def parse_product_info(page):
     title = soup.select("#productTitle")[0].get_text().strip()
 
     # Product category (concatenated)
-    category = ' '.join([elem.get_text().strip()
-                         for elem in soup.select(
-                        '#wayfinding-breadcrumbs_container ul.a-unordered-list'
-                        )[0].findAll('li')])
+    cats = soup.select('#wayfinding-breadcrumbs_container ul.a-unordered-list')
+    if cats:
+        category = ' '.join([elem.get_text().strip()
+                             for elem in cats[0].findAll('li')])
+    else:
+        category = ''
 
     # Product features (concatenated)
     features = '\n'.join([elem.get_text().strip()
