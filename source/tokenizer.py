@@ -13,7 +13,7 @@ class Tokenizer(object):
                  lemmatize=False,
                  min_word_length=1,
                  strip_punctuation=True,
-                 remove_numbers=False,
+                 remove_numbers=True,
                  strip_html=True):
         self.remove_stop_words = remove_stop_words
         self.lemmatize = lemmatize

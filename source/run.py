@@ -1,4 +1,5 @@
 import pandas as pd
+from pandas import ExcelWriter
 from scrape import get_product_info
 from tokenizer import get_token_counts
 
@@ -19,30 +20,53 @@ print('Getting info for all products')
 product_info = df_asins['Customer search term'].apply(
     lambda x: pd.Series(get_product_info(x)))
 
+# Create title column in df:
+df['title'] = product_info['title']
 
 # TITLES:
 # Token count matrix:
 tokens_title = get_token_counts(product_info['title'])
 # Document count:
-tkn_doc_count_title = (tokens_title > 0).sum(axis=0)
-print(tkn_doc_count_title.sort_values(ascending=False).head(20))
+tkn_doc_count_title = tokens_title.sum(
+    axis=0).sort_values(
+    ascending=False)
 
 # bi-grams:
-tokens_title = get_token_counts(product_info['title'], ngrams=2)
-tkn_doc_count_title = (tokens_title > 0).sum(axis=0)
-print(tkn_doc_count_title.sort_values(ascending=False).head(20))
-
+tokens_title_bi = get_token_counts(product_info['title'], ngrams=2)
+tkn_doc_count_title_bi = tokens_title_bi.sum(
+    axis=0).sort_values(
+    ascending=False)
 
 # FEATURES:
 tokens_feat = get_token_counts(product_info['features'])
-tkn_doc_count_feat = (tokens_feat > 0).sum(axis=0)
-print(tkn_doc_count_feat.sort_values(ascending=False).head(20))
+tkn_doc_count_feat = tokens_feat.sum(
+    axis=0).sort_values(
+    ascending=False)
 
 # bi-grams
-tokens_feat = get_token_counts(product_info['features'], ngrams=2)
-tkn_doc_count_feat = (tokens_feat > 0).sum(axis=0)
-print(tkn_doc_count_feat.sort_values(ascending=False).head(20))
-
+tokens_feat_bi = get_token_counts(product_info['features'], ngrams=2)
+tkn_doc_count_feat_bi = tokens_feat_bi.sum(
+    axis=0).sort_values(
+    ascending=False)
 
 # CATEGORY
 print(product_info['category'].value_counts())
+
+
+def save_dfs_as_xls(list_dfs, sheet_names, out_path):
+    ''' Save list of DataFrames to single multi-sheet Excel file '''
+    with ExcelWriter(out_path) as writer:
+        for i, df in enumerate(list_dfs):
+            df.to_excel(writer, sheet_names[i])
+        writer.save()
+
+to_save = [df,
+           tkn_doc_count_title, tkn_doc_count_title_bi,
+           tkn_doc_count_feat, tkn_doc_count_feat_bi]
+sheet_names = ['Ad Perforance',
+               'Title Terms',
+               'Title Terms (bigrams)',
+               'Feature Terms',
+               'Feature Terms (bigrams)']
+
+save_dfs_as_xls(to_save, sheet_names, 'data/amazon_ad_keywords.xlsx')
